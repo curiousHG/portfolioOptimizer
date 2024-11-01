@@ -1,17 +1,16 @@
-version: '3.8'
 
 services:
   # Frontend Service
-  ui:
-    build:
-      context: ./ui
-      dockerfile: Dockerfile
-    ports:
-      - "3000:3000"  # Port for frontend access
-    depends_on:
-      - backend
-    networks:
-      - app-network
+  # ui:
+  #   build:
+  #     context: ./ui
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "3000:3000"
+  #   depends_on:
+  #     - server
+  #   networks:
+  #     - app-network
 
   # Backend Service
   server:
@@ -19,7 +18,7 @@ services:
       context: ./server
       dockerfile: Dockerfile
     ports:
-      - "5000:5000"  # Port for backend access
+      - "5001:${SERVER_PORT}"
     depends_on:
       - data-fetch-service
       - analytics-service
@@ -28,13 +27,14 @@ services:
     networks:
       - app-network
     environment:
-      - DATABASE_URL=postgres://postgres:password@postgres:5432/mutualfunds
-      - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL}
+      - PORT=${SERVER_PORT}
 
   # Data Fetch Service
   data-fetch-service:
     build:
-      context: ./data-fetch-service
+      context: ./data-service
       dockerfile: Dockerfile
     depends_on:
       - redis
@@ -42,8 +42,9 @@ services:
     networks:
       - app-network
     environment:
-      - DATABASE_URL=postgres://postgres:password@postgres:5432/mutualfunds
-      - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL}
+      - PORT=${DATA_SERVICE_PORT}
 
   # Analytics Service
   analytics-service:
@@ -55,13 +56,14 @@ services:
     networks:
       - app-network
     environment:
-      - DATABASE_URL=postgres://postgres:password@postgres:5432/mutualfunds
+      - DATABASE_URL=${DATABASE_URL}
+      - PORT=${ANALYTICS_SERVICE_PORT}
 
   # Redis Cache
   redis:
     image: redis:alpine
     ports:
-      - "6379:6379"
+      - "${REDIS_PORT}:6379"
     networks:
       - app-network
 
@@ -69,9 +71,9 @@ services:
   postgres:
     image: postgres:alpine
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: mutualfunds
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
     networks:
