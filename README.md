@@ -10,8 +10,13 @@ This project is a portfolio optimization tool that consists of several services:
 ## Project Structure
 
 
-<!-- code block run flask service in development mode -->
+### Run the data-service for development
+Make sure redis is running in background using docker on host localhost:6379
+
 ```bash
-# Run the Flask service in development mode
-flask 
+docker run -d -p 6379:6379 redis
+```
+
+```bash
+flask --app main run --debug
 ```
