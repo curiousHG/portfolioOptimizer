@@ -28,7 +28,8 @@ services:
       - app-network
     environment:
       - DATABASE_URL=${DATABASE_URL}
-      - REDIS_URL=${REDIS_URL}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
       - PORT=${SERVER_PORT}
 
   # Data Fetch Service
@@ -43,7 +44,8 @@ services:
       - app-network
     environment:
       - DATABASE_URL=${DATABASE_URL}
-      - REDIS_URL=${REDIS_URL}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
       - PORT=${DATA_SERVICE_PORT}
 
   # Analytics Service
@@ -58,6 +60,8 @@ services:
     environment:
       - DATABASE_URL=${DATABASE_URL}
       - PORT=${ANALYTICS_SERVICE_PORT}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
 
   # Redis Cache
   redis:

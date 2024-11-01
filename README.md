@@ -8,3 +8,10 @@ This project is a portfolio optimization tool that consists of several services:
 - **Brain Service**: A Python service responsible for performing analytics.
 
 ## Project Structure
+
+
+<!-- code block run flask service in development mode -->
+```bash
+# Run the Flask service in development mode
+flask 
+```
