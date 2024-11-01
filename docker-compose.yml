@@ -1,0 +1,87 @@
+version: '3.8'
+
+services:
+  # Frontend Service
+  ui:
+    build:
+      context: ./ui
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"  # Port for frontend access
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+  # Backend Service
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"  # Port for backend access
+    depends_on:
+      - data-fetch-service
+      - analytics-service
+      - redis
+      - postgres
+    networks:
+      - app-network
+    environment:
+      - DATABASE_URL=postgres://postgres:password@postgres:5432/mutualfunds
+      - REDIS_URL=redis://redis:6379
+
+  # Data Fetch Service
+  data-fetch-service:
+    build:
+      context: ./data-fetch-service
+      dockerfile: Dockerfile
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - app-network
+    environment:
+      - DATABASE_URL=postgres://postgres:password@postgres:5432/mutualfunds
+      - REDIS_URL=redis://redis:6379
+
+  # Analytics Service
+  analytics-service:
+    build:
+      context: ./analytics-service
+      dockerfile: Dockerfile
+    depends_on:
+      - postgres
+    networks:
+      - app-network
+    environment:
+      - DATABASE_URL=postgres://postgres:password@postgres:5432/mutualfunds
+
+  # Redis Cache
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mutualfunds
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
