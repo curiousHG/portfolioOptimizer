@@ -11,12 +11,22 @@ This project is a portfolio optimization tool that consists of several services:
 
 
 ### Run the data-service for development
-Make sure redis is running in background using docker on host localhost:6379
+Make sure redis is running in background using docker on host localhost:6379 with container name my-redis
 
 ```bash
-docker run -d -p 6379:6379 redis
+docker run -d -p 6379:6379 --name my-redis redis:latest
 ```
 
 ```bash
 flask --app main run --debug
+```
+
+Visualise redis 
+```bash
+docker run -d --name redisinsight -p 5540:5540 redis/redisinsight:latest
+```
+
+Get redis container ip for redisinsight
+```bash
+docker container inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" my-redis
 ```
